@@ -78,18 +78,20 @@ export default function Home() {
             </Button>
           </SignedOut>
           <SignedIn>
-            <UserButton
+            <Box // Use a Box container to style UserButton
               sx={{
                 marginLeft: 2,
                 padding: "4px 8px",
                 backgroundColor: "#ffffff",
-                color: "#3f51b5",
                 borderRadius: "50%",
                 "&:hover": {
                   backgroundColor: "#f0f0f0",
+                  opacity: 0.9, // Slightly reduce opacity on hover
                 },
               }}
-            />
+            >
+              <UserButton />
+            </Box>
           </SignedIn>
         </Toolbar>
       </AppBar>
