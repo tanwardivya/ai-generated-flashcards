@@ -135,7 +135,7 @@ export default function Generate() {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4">Generate Flashcards</Typography>
+        <Typography variant="h4">AI powered Flashcards</Typography>
         <Paper sx={{ p: 4, width: "100%" }}>
           <TextField
             value={text}
@@ -206,7 +206,14 @@ export default function Generate() {
                               minHeight: "150px",
                             }}
                           >
-                            <Typography variant="h5" component="div">
+                            <Typography variant="h5" component="div"
+                            sx={{
+                                fontSize: "clamp(0.8rem, 1.5vw, 1.2rem)", // Dynamically adjust font size
+                                lineHeight: "1.2", // Adjust line height for better spacing
+                                wordWrap: "break-word", // Ensure long words break and wrap
+                                padding: "8px", // Add padding for better spacing
+                              }}
+                            >
                               {flashcard.front}
                             </Typography>
                           </Box>

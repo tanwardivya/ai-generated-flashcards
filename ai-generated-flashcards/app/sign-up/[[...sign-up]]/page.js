@@ -5,11 +5,11 @@ import Link from "next/link";
 
 export default function SignUpPage() {
   return (
-    <Container maxWidth="100vw">
-      <AppBar position="static" sx={{ backgroundColor: "#3f51b5" }}>
+    <Container maxWidth="50vw">
+      <AppBar position="static" sx={{ backgroundColor: "#ff9800" }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            FLashcard SaaS
+            AI FLashcards
           </Typography>
           <Button color="inherit">
             <Link href="/sign-up" passHref>
@@ -30,7 +30,8 @@ export default function SignUpPage() {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h4">Sign Up</Typography>
+        <Typography variant="h4" gutterBottom></Typography>
+        <Typography variant="h4" gutterBottom></Typography>
         <SignUp />
       </Box>
     </Container>
