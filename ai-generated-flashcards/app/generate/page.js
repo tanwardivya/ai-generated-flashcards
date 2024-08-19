@@ -86,32 +86,61 @@ export default function Generate() {
       return;
     }
 
-    const batch = writeBatch(db);
+    // Ensure this is a new batch
+    let batch = writeBatch(db);
     const userDocRef = doc(collection(db, "users"), user.id);
 
-    const docSnap = await getDoc(userDocRef);
+    try {
+      const docSnap = await getDoc(userDocRef);
 
-    if (docSnap.exists()) {
-      const collections = docSnap.data().flashcards || [];
-      if (collections.find((f) => f.name === name)) {
-        alert("Flashcard collection with the same name already exists.");
-        return;
+      if (docSnap.exists()) {
+        const collections = docSnap.data().flashcards || [];
+        if (collections.find((f) => f.name === name)) {
+          alert("Flashcard collection with the same name already exists.");
+          return;
+        } else {
+          // Update the user's flashcard collections
+          collections.push({ name });
+          batch.set(userDocRef, { flashcards: collections }, { merge: true });
+
+          // Commit the batch to update the user's flashcard collection
+          await batch.commit();
+
+          // Now create a new batch for the flashcards themselves
+          batch = writeBatch(db);
+          const colRef = collection(userDocRef, name);
+
+          flashcards.forEach((flashcard) => {
+            const cardDocRef = doc(colRef);
+            batch.set(cardDocRef, flashcard);
+          });
+
+          // Commit the batch to save the individual flashcards
+          await batch.commit();
+        }
       } else {
-        collections.push({ name });
-        batch.set(userDocRef, { flashcards: collections }, { merge: true });
+        // If user document doesn't exist, create it and add flashcards
+        batch.set(userDocRef, { flashcards: [{ name }] });
+        await batch.commit();
+
+        // Now create a new batch for the flashcards themselves
+        batch = writeBatch(db);
+        const colRef = collection(userDocRef, name);
+
+        flashcards.forEach((flashcard) => {
+          const cardDocRef = doc(colRef);
+          batch.set(cardDocRef, flashcard);
+        });
+
+        // Commit the batch to save the individual flashcards
         await batch.commit();
       }
-    } else {
-      batch.set(userDocRef, { flashcards: [{ name }] });
-    }
 
-    const colRef = collection(userDocRef, name);
-    flashcards.forEach((flashcard) => {
-      const cardDocRef = doc(colRef);
-      batch.set(cardDocRef, flashcard);
-    });
-    await batch.commit();
-    handleClose();
+      handleClose();
+    } catch (error) {
+      console.error("Error saving flashcards: ", error);
+      alert("An error occurred while saving the flashcards. Please try again.");
+    }
   };
 
   // Colors array for colorful flashcards
@@ -206,8 +235,10 @@ export default function Generate() {
                               minHeight: "150px",
                             }}
                           >
-                            <Typography variant="h5" component="div"
-                            sx={{
+                            <Typography
+                              variant="h5"
+                              component="div"
+                              sx={{
                                 fontSize: "clamp(0.8rem, 1.5vw, 1.2rem)", // Dynamically adjust font size
                                 lineHeight: "1.2", // Adjust line height for better spacing
                                 wordWrap: "break-word", // Ensure long words break and wrap
